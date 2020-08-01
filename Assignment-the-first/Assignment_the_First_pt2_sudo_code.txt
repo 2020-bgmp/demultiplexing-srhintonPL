@@ -1,0 +1,56 @@
+
+
+
+PART 2 sudocode
+
+I need to write a script to de-multiplex sequencing data from 1 lane of an illumina flow cell.
+
+We have 4 FASTQ files to deal with: 2 biological read files (they contain the sequencing data for the insert) and 2 index files (they contain the index barcodes for the samples)
+
+THE FIRST RECORD FOR EACH INPUT FILE CORRESPONDS TO THE SAME SAME READ  (look at imput file x/y coordinates)
+
+
+1) reference all imput files with an absolute path /projects/bgmp/shared/2017_sequencing/ and open them (DO THIS FIRST!!!!!)
+    - 1294_S1_L008_R1_001.fastq.gz (READ 1)
+    - 1294_S1_L008_R2_001.fastq.gz (INDEX 1)
+    - 1294_S1_L008_R3_001.fastq.gz (INDEX 2)
+    - 1294_S1_L008_R4_001.fastq.gz (READ 2)
+
+*just open them all once with a loop. use "open" not "with open"*
+
+*"itertools" ill be helpful*
+
+    ```I will also need to write a command to unzip these files before any parsing can be done```
+
+
+2) I will need to interate over all 4 files and verify that both indices for each read match.
+   to do this I will attempt the following:
+
+   i) Generate a dictionary that maps nucleotides to the complement nucleotides. 
+        def: comp_seq
+        ''' comp_seq is a dictionary that stores all complement nucleotide base pair combinations . e.g (A : T) or (T : A)'''
+
+   ii) Define a function that returns the reverse complement of an input index
+        def: rev_comp
+        ''' rev_comp is a function that returns the reverse complement of an imput index.
+   
+   iii) I will need to make an index dictionary will all known indices
+        ''' this will be done probably with a "with open" comand for the file containing index sequences. e.g with open(barcodes, 'r')
+        
+   iv) once reverse complemented I will iterate over each base position and confirm that they match.
+
+        - for matching indexes the forward biological read and its barcode will be moved to its own unique FASTQ file. The same for the reverse biological read. (48 Files total)
+
+        - if they do not match I will move them to a seperate FASTQ file (probably will need to use a loop here similar to the bit wise flag thing we did in PS8) (1 file for index hopping where...)
+
+        - if one of the barcodes is unknown the entire read will be moved to its own FASTQ file.
+
+        - if both indexes are unknown the entire read will be mmoved to its own FASTQ file. ()
+
+        * counters for all of the above will be initialized and returned at the end of the loop *
+
+   v) To do the above I will write a function to loop over every line in all four files and do the following    
+      - strip each line in the file and assign them a name corresponding to the information the line contains. i.e header, sequence,plus line, qscore (my thinking is that this might be useful later)
+      - finally using "if" statements I will verify that the stripped barcodes match and will be sorted accordingly while incrementing the respective counters. 
+
+*All FASTQ files will have the index barcode in the header line* 
